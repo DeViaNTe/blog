@@ -4,8 +4,11 @@ angular.module('App.Controllers')
       $scope.tutorial = engine.tutorial();
 
       // fake
+      $scope.tutorial.addStep();
       $scope.tutorial.title('Titulo del parrafo 1');
-      $scope.tutorial.paragraph("Un parrafo con bla bla bla...").async();
+
+      $scope.tutorial.addStep();
+      $scope.tutorial.paragraph("Un parrafo con bla bla bla...");
       $scope.tutorial.file("index.html", 'html', [
         '<!doctype html>',
         '<html lang="en">',
@@ -18,8 +21,14 @@ angular.module('App.Controllers')
         '</body>',
         '</html>'
       ].join("\n"));
+
+      $scope.tutorial.addStep();
       $scope.tutorial.title('Titulo del parrafo 2');
+
+      $scope.tutorial.addStep();
       $scope.tutorial.title('Titulo del parrafo 3');
+
+      $scope.tutorial.init();
 
 
       /*

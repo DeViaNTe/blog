@@ -1,5 +1,5 @@
 /*global window */
-var ngappRequires = ['compile', 'ngRoute', 'ngAnimate', 'ngTouch', 'ngResource', 'ngSanitize', 'App.Services', 'App.Routes', 'App.Directives', 'App.Controllers'];
+var ngappRequires = ['ngRoute', 'ngAnimate', 'ngTouch', 'ngResource', 'ngSanitize', 'App.Services', 'App.Routes', 'App.Directives', 'App.Controllers'];
 
 var app = {
   initialize: function () {

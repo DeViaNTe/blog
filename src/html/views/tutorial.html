@@ -5,7 +5,11 @@
     <span ng-show="!(tutorial._running)" class="label label-danger">Stopped</span>
   </div>
 
-  <div ng-compile="tutorial.view()"></div>
+  <div nag-compile="tutorial.view()"></div>
+  <div ng-repeat="step in tutorial._steps[tutorial._currentStep] track by $index">
+    <div ng-include src="'tutorial-element/' + step.props.type + '.html'"></div>
+  </div>
+
 
   <div>
     <button class="btn btn-default pull-left" ng-click="tutorial.prev()">Previous step</button>

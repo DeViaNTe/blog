@@ -5,29 +5,32 @@ angular.module('App.Services')
     /* engine */
     var Engine = function Engine() {
       this.props = {
-        async: false,
         type: "unknown"
       };
-    };
-
-    Engine.prototype.async = function() {
-      this.props.async = true;
-      return this;
     };
 
     /* tutorial */
     var Tutorial = function Tutorial() {
       this._files = {};
-      this._currentStep = 0;
+      this._currentStep = -1;
       this._running = false;
       this._steps = [];
+    };
+
+    Tutorial.prototype.addStep = function() {
+      this._steps.push([]);
+      this._currentStep++;
+    };
+
+    Tutorial.prototype.init = function() {
+      this._currentStep = 0;
     };
 
     Tutorial.prototype.title = function(text) {
       var obj = new Engine();
       obj.props.type = "title";
       obj.props.content = text;
-      this._steps.push(obj);
+      this._steps[this._currentStep].push(obj);
       return obj;
     };
 
@@ -35,7 +38,7 @@ angular.module('App.Services')
       var obj = new Engine();
       obj.props.type = "paragraph";
       obj.props.content = text;
-      this._steps.push(obj);
+      this._steps[this._currentStep].push(obj);
       return obj;
     };
 
@@ -52,26 +55,26 @@ angular.module('App.Services')
         this._files[name] = [contents];
         obj.props.fileIndex = 0;
       }
-      this._steps.push(obj);
+      this._steps[this._currentStep].push(obj);
       return obj;
     };
 
     /* views */
     Tutorial.prototype.view = function() {
-      var i = this._currentStep;
+      var step = this._steps[this._currentStep];
       var template = "";
-      var step = null;
-      for (;i<this._steps.length;i++) {
-        step = this._steps[i];
-        template += "<div ng-include=\" 'tutorial-element/" + step.props.type + ".html' \"></div>";
-        if (step.props.async === false) { break; }
+      var i=0;
+      var limit=step.length;
+
+      for (;i<limit;i++) {
+        template += "<div ng-include=\" 'tutorial-element/" + step[i].props.type + ".html' \"></div>";
       }
       return template;
     };
 
     Tutorial.prototype.next = function() {
       this._currentStep++;
-      if (this._currentStep >= this._steps.length) { this._currentStep = this._steps.length; }
+      if (this._currentStep >= this._steps.length) { this._currentStep = this._steps.length - 1; }
     };
 
     Tutorial.prototype.prev = function() {
@@ -86,9 +89,9 @@ angular.module('App.Services')
 
   })
   .run(['$templateCache', function ($templateCache) {
-    $templateCache.put('tutorial-element/title.html', '<h1> titulo xD </h1>');
-    $templateCache.put('tutorial-element/paragraph.html', '<p> parrafo </p>');
-    $templateCache.put('tutorial-element/file.html', '<p> código </p>');
+    $templateCache.put('tutorial-element/title.html', '<h1> {{step.props.content}} </h1>');
+    $templateCache.put('tutorial-element/paragraph.html', '<p> {{step.props.content}} </p>');
+    $templateCache.put('tutorial-element/file.html', '<p> {{step.props.name}} </p> ');
   }]);
 
 /*

@@ -1,0 +1,53 @@
+.tutorial {
+
+  .tutorial-screen {
+    /* positions */
+    margin-bottom: 0;
+
+    /* styles */
+    background: url("img/jumbo.jpg");
+    background-position: center center;
+    @include background-size(cover);
+    @include box-shadow(inset 0 5px 5px rgba(black, 0.5), inset 0 -5px 5px rgba(black, 0.5));
+
+    .page-header {
+      margin-top: 0;
+      h1 { color: white; }
+      @include when-xs() { margin-top: 10px; }
+      .label { margin: 0 4px; }
+    }
+
+    .box {
+      /* positions */
+      position: relative;
+      border-radius: 1px;
+      margin: 30px 0;
+      padding: 10px;
+
+      /* styles */
+      color: white;
+      font-family: 'aaargh';
+      background: rgba(black,0.8);
+      @include box-shadow(0 0 10px 10px rgba(black, 0.8));
+
+      /* decorations */
+      &:after, &:before {
+        content: ""; position: absolute; top: 10px; right: -7px; bottom: 10px; width: 1px;
+        @include background-image(linear-gradient(top,  rgba(white,0) 0%,rgba(white,1) 50%,rgba(white,0) 100%));
+      }
+      &:before { right: initial; left: -7px; }
+    }
+  }
+
+
+
+
+  .tutorial-picture {
+    margin: 0 auto;
+  }
+
+  .tutorial-description {
+    text-align: justify;
+    @include when-xs() { margin-top: 10px; }
+  }
+}

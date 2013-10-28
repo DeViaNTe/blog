@@ -1,0 +1,78 @@
+@mixin unselectable() {
+  @include experimental(user-select, none);
+}
+
+@mixin keyframes($name) {
+    @-webkit-keyframes #{$name} { @content; }
+    @-moz-keyframes #{$name} { @content; }
+    @-ms-keyframes #{$name} { @content; }
+    @-o-keyframes #{$name} { @content; }
+    @keyframes #{$name} { @content; }
+}
+
+@mixin animation($name, $duration: 1s, $timing: linear, $delay: 0s, $iteration: infinite, $direction: normal, $state: running) {
+    & {
+        @include experimental(animation-name, $name);
+        @include experimental(animation-duration, $duration);
+        @include experimental(animation-timing-function, $timing);
+        @include experimental(animation-delay, $delay);
+        @include experimental(animation-iteration-count, $iteration);
+        @include experimental(animation-direction, $direction);
+        @include experimental(animation-play-state, $state);
+    }
+}
+
+@mixin button($name, $color, $fontsize: 21px, $radius: 2px) {
+  .btn-#{$name} {
+    vertical-align: middle;
+    border: 1px solid darken($color, 13.9%);
+    color: #FFF;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+    font-size: $fontsize;
+    font-weight: 600;
+    line-height: ceil($fontsize * 1.4);
+    background: $color;
+    border-radius: $radius;
+    @include box-shadow(inset 0 1px 0 rgba(white, 0.3),0 1px 3px rgba(black, 0.4));
+    @include background-image(linear-gradient(top,  lighten($color, 10%) 20%,$color 100%));
+    @include unselectable();
+    @include transition(background-image 0.1s ease-out);
+
+    &:hover {
+      border: 1px solid darken($color, 13.9%);
+      @include background-image(linear-gradient(top,  lighten($color, 5%) 20%, darken($color, 5%) 100%));
+    }
+    &:active { background: darken($color, 10%); @include box-shadow(inset 0 2px 2px rgba(black, 0.2)); }
+  }
+}
+
+@mixin position-cover($pos: 0) {
+  & {
+    position: absolute;
+    top: $pos;
+    left: $pos;
+    right: $pos;
+    bottom: $pos;
+  }
+}
+
+
+/* from 0 to xxx */
+@mixin when-xs() { @media screen and (max-width: $screen-xs-max) { & { @content; } } }
+@mixin when-sm() { @media screen and (max-width: $screen-sm-max) { & { @content; } } }
+@mixin when-md() { @media screen and (max-width: $screen-md) { & { @content; } } }
+
+/* from xxx to infinite */
+@mixin further-xs() { @media screen and (min-width: $screen-xs) { & { @content; } } }
+@mixin further-sm() { @media screen and (min-width: $screen-sm) { & { @content; } } }
+@mixin further-md() { @media screen and (min-width: $screen-md) { & { @content; } } }
+@mixin further-lg() { @media screen and (min-width: $screen-lg) { & { @content; } } }
+
+/* define exact measures */
+@mixin before-width($size) { @media screen and (max-width: $size) { & { @content; } } }
+@mixin further-width($size) { @media screen and (min-width: $size) { & { @content; } } }
+@mixin between-widths($min, $max) { @media screen and (min-width: $min) and (max-width: $max) { & { @content; } } }
+
+@mixin when-portrait() { @media screen and (orientation:portrait) { & { @content; } } }
+@mixin when-landscape() { @media screen and (orientation:landscape) { & { @content; } } }

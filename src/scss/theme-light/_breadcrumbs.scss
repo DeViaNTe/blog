@@ -1,0 +1,11 @@
+.breadcrumbs-bar {
+  background: $breadcrumbs-background-color;
+  border-top: 1px solid lighten($breadcrumbs-background-color, 10%);
+  border-bottom: 1px solid darken($breadcrumbs-background-color, 20%);
+
+  .breadcrumb {
+    margin-bottom: 0;
+    border-radius: 0;
+    background: $breadcrumbs-background-color;
+  }
+}

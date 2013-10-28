@@ -1,0 +1,9 @@
+http_path = "/"
+css_dir = "./.css-cache/"
+sass_dir = "src/scss"
+images_dir = "src/img"
+javascripts_dir = "src/js"
+# output_style = :expanded or :nested or :compact or :compressed
+output_style = :expanded
+# relative_assets = true
+line_comments = false

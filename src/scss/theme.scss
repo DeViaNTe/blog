@@ -1,0 +1,33 @@
+/* Main theme */
+@import "compass";
+@import "../../vendor/bootstrapsass/bootstrap";
+@import "utils/mixins";
+//@import "utils/animations";
+@import "utils/fonts";
+
+body {
+  -webkit-touch-callout: none;                      /* prevent callout to copy image, etc when tap to hold */
+  -webkit-text-size-adjust: none;                   /* prevent webkit from resizing text to fit */
+  -webkit-user-select: none;                        /* prevent copy paste, to allow, change 'none' to 'text' */
+  font-family: 'HelveticaNeue-Light', 'HelveticaNeue', Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  height: 100%;
+  margin: 0px;
+  padding: 0px;
+  ///overflow-x: hidden;
+  ///overflow-y: hidden;
+}
+
+.spacer-xs { height: 20px; display: block; }
+.spacer-sm { height: 30px; display: block; }
+
+/* theme */
+.theme-light {
+  $navbar-background-color          : #EEE;
+  $breadcrumbs-background-color     : #DDD;
+
+  @import "theme-light/navbar";
+  @import "theme-light/breadcrumbs";
+  @import "theme-light/jumbotron";
+  @import "theme-light/tutorial";
+}

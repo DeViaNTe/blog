@@ -1,0 +1,14 @@
+<div style="padding: 10px;">
+  <div> Tutorial sample: [Animation: {{tutorial._currentStep}} / {{tutorial._steps.length}}] </div>
+  <div>
+    <span ng-show="tutorial._running" class="label label-success">Playing</span>
+    <span ng-show="!(tutorial._running)" class="label label-danger">Stopped</span>
+  </div>
+
+  <div ng-compile="tutorial.view()"></div>
+
+  <div>
+    <button class="btn btn-default pull-left" ng-click="tutorial.prev()">Previous step</button>
+    <button class="btn btn-default pull-right" ng-click="tutorial.next()">Next step</button>
+  </div>
+</div>

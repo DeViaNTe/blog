@@ -1,0 +1,13 @@
+
+/* theme: cogs */
+.parallax-clouds {
+  background-image: url("img/dark-stripedsuede.png");
+  background-attachment: fixed;
+  @include box-shadow(inset 0 8px 16px black, inset 0 -8px 16px black);
+
+  .parallax-layer { width: 400px; height: 253px;  background: url("img/clouds/cloud2.png"); }
+
+  .layer-1 { top: -50px; left: 0px; }
+  .layer-2 { top: 50%; right: -190px; left: auto; @include transform(scale(-1.2,1.2)); }
+
+}

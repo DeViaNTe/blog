@@ -4,18 +4,17 @@ angular.module('App.Services')
 
   /* setup interface */
   self.callbacks = {};
-  self.log = [];
 
   self.$on = function(eventName, eventCallback) {
     var callbacks = self.callbacks[eventName] || [];
     callbacks.push(eventCallback);
     self.callbacks[eventName] = callbacks;
+    return function () { self.callbacks[eventName].splice(self.callbacks[eventName].indexOf(eventCallback), 1); };
   };
 
   self.$emit = function(eventName, arg1, arg2, arg3, arg4, arg5, arg6, arg7) {
     var callbacks = self.callbacks[eventName] || [];
     angular.forEach(callbacks, function (callback) { callback(arg1, arg2, arg3, arg4, arg5, arg6, arg7); });
-    self.log.push(eventName + " - " + arg1);
   };
 
   /* setup event handler */
@@ -42,8 +41,7 @@ angular.module('App.Services')
   this.$get = function () {
     return {
       $on: self.$on,
-      $emit: self.$emit,
-      log: self.log
+      $emit: self.$emit
     };
   };
 });

@@ -8,6 +8,7 @@ angular.module('App.Directives')
       compile: function(tElement, tAttrs, transclude) {
         return {
           post: function postLink(scope, $element, $attributes, controller) {
+
             scope.$watch(
               function (scope) {
                 return scope.$eval( $attributes.ngCompile );
@@ -17,6 +18,7 @@ angular.module('App.Directives')
                 $compile($element.contents())(scope);
               }
             );
+
           }
         };
       }

@@ -1,5 +1,17 @@
-.navbar {
-  margin-bottom: 0;
-  background: $navbar-background-color;
-  border-bottom: 1px solid darken($navbar-background-color, 20%);
+.header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: $navbar-height;
+
+  .navbar {
+    margin-bottom: 0;
+    background: $navbar-background-color;
+    border-bottom: 1px solid darken($navbar-background-color, 20%);
+
+    .navbar-brand {
+      color: $navbar-font-color;
+    }
+  }
 }

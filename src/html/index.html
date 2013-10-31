@@ -10,11 +10,9 @@
   <title>Blog</title>
 </head>
 <body ng-controller="MainCtrl" ng-class="theme">
-
-  <div ng-include="'header.html'"></div>
-  <div ng-include="'breadcrumbs.html'"></div>
-
-  <div ng-view></div>
+  <div class="header" ng-include="'header.html'"></div>
+  <div class="breadcrumbs" ng-include="'breadcrumbs.html'"></div>
+  <div class="mainview" ng-view style="min-height: 80%"></div>
 
   <template id="header.html" src="./src/html/views/header.html"> </template>
   <template id="breadcrumbs.html" src="./src/html/views/breadcrumbs.html"> </template>
@@ -37,6 +35,12 @@
     <script src="./src/js/controllers/*.js"></script>
     <script src="./src/js/services/*.js"></script>
     <script src="./src/js/app.js"></script>
+  </build>
+
+  <script type="text/javascript" src="ace/ace.js"></script>
+  <build type="js" destfolder="assets" destfile="emmet.js">
+    <script src="./vendor/emmet/emmet.js"></script>
+    <script src="./vendor/ace/ext-emmet.js"></script>
   </build>
 
   <script>

@@ -2,8 +2,11 @@
 @import "compass";
 @import "../../vendor/bootstrapsass/bootstrap";
 @import "utils/mixins";
-//@import "utils/animations";
+@import "utils/animations";
 @import "utils/fonts";
+@import "utils/parallax";
+
+html, body { height: 100%; }
 
 body {
   -webkit-touch-callout: none;                      /* prevent callout to copy image, etc when tap to hold */
@@ -11,23 +14,96 @@ body {
   -webkit-user-select: none;                        /* prevent copy paste, to allow, change 'none' to 'text' */
   font-family: 'HelveticaNeue-Light', 'HelveticaNeue', Helvetica, Arial, sans-serif;
   font-size: 12px;
-  height: 100%;
   margin: 0px;
   padding: 0px;
-  ///overflow-x: hidden;
-  ///overflow-y: hidden;
+  position: relative;
 }
 
 .spacer-xs { height: 20px; display: block; }
 .spacer-sm { height: 30px; display: block; }
 
+h1,h2 { font-family: 'aaargh'; text-shadow: 2px 2px 2px rgba(black, 0.5); }
+
 /* theme */
 .theme-light {
   $navbar-background-color          : #EEE;
+  $navbar-font-color                : #000;
+  $navbar-height                    : 51px;
+
+  $breadcrumbs-height               : 35px;
   $breadcrumbs-background-color     : #DDD;
+  $breadcrumbs-link-color           : inherit;
+  $breadcrumbs-active-color         : inherit;
+
+  $body-background                  : url("img/gplaypattern.png");
+  $container-background             : white;
+  $container-border                 : #ccc;
+  $container-font-color             : black;
 
   @import "theme-light/navbar";
   @import "theme-light/breadcrumbs";
+  @import "theme-light/mainview";
   @import "theme-light/jumbotron";
   @import "theme-light/tutorial";
+  @import "theme-light/parallax-cogs";
+  @import "theme-light/parallax-clouds";
+}
+
+/* theme */
+.theme-dark {
+  $navbar-background-color          : #333;
+  $navbar-font-color                : #FFF;
+  $navbar-height                    : 51px;
+
+  $breadcrumbs-height               : 35px;
+  $breadcrumbs-background-color     : #444;
+  $breadcrumbs-link-color           : #DDD;
+  $breadcrumbs-active-color         : #FFF;
+
+  $body-background                  : url("img/gplaypatterndark.png");
+  $container-background             : #333;
+  $container-border                 : #666;
+  $container-font-color             : white;
+
+  @import "theme-light/navbar";
+  @import "theme-light/breadcrumbs";
+  @import "theme-light/mainview";
+  @import "theme-light/jumbotron";
+  @import "theme-light/tutorial";
+  @import "theme-light/parallax-cogs";
+  @import "theme-light/parallax-clouds";
+}
+
+
+.ace_editor {
+
+  .theme-dark & {
+    border-radius: 3px;
+    border: 1px solid #555;
+  }
+
+  .theme-light & {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+  }
+
+  margin: 10px;
+}
+
+.thumbnail { margin-bottom: 20px; }
+
+
+
+.ace_marker-flashing-red {
+  position: absolute;
+  background: rgba(red, 0.4);
+  border: 1px solid red;
+  @include animate(flash, 1s, 0s, linear, normal, infinite);
+}
+
+.ace_marker-flashing-gold {
+  position: absolute;
+  background: rgba(gold, 0.4);
+  border: 1px solid gold;
+  @include animate(flash, 1s, 0s, linear, normal, infinite);
 }

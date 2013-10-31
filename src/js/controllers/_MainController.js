@@ -6,7 +6,7 @@ angular.module('App.Controllers')
     this.$routeParams   = $routeParams;
     this.$rootScope     = $rootScope;
 
-    $rootScope.theme = "theme-light";
+    $rootScope.theme = "theme-dark";
 
     /* prevent unauth users */
     $rootScope.$on('$locationChangeStart', function (event, next, current) {

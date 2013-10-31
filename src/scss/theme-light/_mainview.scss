@@ -1,0 +1,18 @@
+.mainview {
+  position: absolute;
+  top: $navbar-height + $breadcrumbs-height;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  background: $body-background;
+
+  .container {
+    background: $container-background;
+    border-left: 1px solid $container-border;
+    border-right: 1px solid $container-border;
+    color: $container-font-color;
+  }
+}

@@ -2,120 +2,78 @@ angular.module('App.Services')
   .provider('engine', function() {
     var self = this;
 
-    /* engine */
-    var Engine = function Engine() {
-      this.props = {
-        type: "unknown"
-      };
+    function Engine(src, eventmanager) {
+      this.debug        = false;
+      this.step         = 0;
+      this.action       = 0;
+      this.numsteps     = src.steps.length;
+      this.src          = src;
+      this.running      = false;
+      this.busy         = false;
+      this.eventmanager = eventmanager;
     };
 
-    /* tutorial */
-    var Tutorial = function Tutorial() {
-      this._files = {};
-      this._currentStep = -1;
-      this._running = false;
-      this._steps = [];
+    Engine.prototype.nextAction = function (cb) {
+      var currentStep = this.src.steps[this.step];
+      var currentAction = currentStep.actions[this.action];
+      var self = this;
+
+      /* copy action array, prepend tutorialengine event */
+      var command = angular.copy(currentAction);
+      command.splice(0, 0, 'tutorialengine');
+
+      /* set busy, setup action end handler */
+      this.busy = true;
+      var clearCallback = this.eventmanager.$on('tutorialenginecb', function () {
+        clearCallback();
+        self.nextActionDone.call(self);
+      });
+
+      /* tell tutorial directive to perform next action */
+      this.eventmanager.$emit.apply(this.eventmanager, command);
     };
 
-    Tutorial.prototype.addStep = function() {
-      this._steps.push([]);
-      this._currentStep++;
-    };
-
-    Tutorial.prototype.init = function() {
-      this._currentStep = 0;
-    };
-
-    Tutorial.prototype.title = function(text) {
-      var obj = new Engine();
-      obj.props.type = "title";
-      obj.props.content = text;
-      this._steps[this._currentStep].push(obj);
-      return obj;
-    };
-
-    Tutorial.prototype.paragraph = function(text) {
-      var obj = new Engine();
-      obj.props.type = "paragraph";
-      obj.props.content = text;
-      this._steps[this._currentStep].push(obj);
-      return obj;
-    };
-
-    Tutorial.prototype.file = function(name, language, contents) {
-      var obj = new Engine();
-      obj.props.type = "file";
-      obj.props.name = name;
-      obj.props.lang = language;
-      obj.props.content = contents;
-      if (this._files.hasOwnProperty(name)) {
-        this._files[name].push(contents);
-        obj.props.fileIndex = this._files[name].length - 1;
-      } else {
-        this._files[name] = [contents];
-        obj.props.fileIndex = 0;
+    Engine.prototype.nextActionDone = function() {
+      this.action++;
+      if (this.action >= this.src.steps[this.step].actions.length) { return this.slideDone(); }
+      else {
+        this.busy = false;
+        if (this.debug === false) { this.nextAction(); }
       }
-      this._steps[this._currentStep].push(obj);
-      return obj;
     };
 
-    /* views */
-    Tutorial.prototype.view = function() {
-      var step = this._steps[this._currentStep];
-      var template = "";
-      var i=0;
-      var limit=step.length;
-
-      for (;i<limit;i++) {
-        template += "<div ng-include=\" 'tutorial-element/" + step[i].props.type + ".html' \"></div>";
-      }
-      return template;
+    Engine.prototype.slideDone = function() {
+      this.action = 0;
+      this.step++;
+      if (this.step >= this.src.steps.length) { return this.tutorialDone(); }
+      else { this.busy = false; }
     };
 
-    Tutorial.prototype.next = function() {
-      this._currentStep++;
-      if (this._currentStep >= this._steps.length) { this._currentStep = this._steps.length - 1; }
+    Engine.prototype.tutorialDone = function() {
+      console.log("tutorial ended");
+      this.busy = false;
     };
 
-    Tutorial.prototype.prev = function() {
-      this._currentStep--;
-      if (this._currentStep < 0) { this._currentStep = 0; }
+    Engine.prototype.play = function() {
+      this.debug = true;
+      this.nextAction();
+    };
+
+    Engine.prototype.next = function () {
+      this.nextAction();
+    };
+
+    Engine.prototype.prev = function() {
+
     };
 
     /* exports */
-    this.$get = function () {
-      return { tutorial: function tuto() { return new Tutorial(); } };
-    };
+    this.$get = ['eventmanager', function (eventmanager) {
+      return {
+        process: function(source) {
+          return new Engine(source, eventmanager);
+        }
+      };
+    }];
 
-  })
-  .run(['$templateCache', function ($templateCache) {
-    $templateCache.put('tutorial-element/title.html', '<h1> {{step.props.content}} </h1>');
-    $templateCache.put('tutorial-element/paragraph.html', '<p> {{step.props.content}} </p>');
-    $templateCache.put('tutorial-element/file.html', '<p> {{step.props.name}} </p> ');
-  }]);
-
-/*
-var tutorial = {
-  title: "my-tuto-rail",
-  subtitle: "como quieras colacao",
-  image: "/holder.js/300x200/industrial",
-  description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras euismod dapibus metus ac faucibus. Phasellus velit magna, aliquam ut facilisis ut, porttitor interdum nisl. Etiam nec nisl orci. Aenean vitae dolor dolor. Curabitur vel tellus molestie, vehicula tellus eu, iaculis nulla. Suspendisse mattis luctus tortor. Nam nulla nisl, gravida in eros blandit, vestibulum accumsan eros. Integer interdum, lectus at iaculis hendrerit, ligula magna adipiscing dui, nec laoreet nisi ante et orci. Aenean at pretium dui. Sed ornare iaculis arcu a bibendum. Mauris sodales dolor in lorem cursus, vel auctor est pharetra. Duis semper vestibulum semper. In varius sagittis orci, vitae lobortis tellus consequat a. In hac habitasse platea dictumst. Suspendisse venenatis vehicula est nec consequat.",
-  tags: ["css3", "bootstrap", "angularjs", "js"],
-  timeline: [
-  ng.title("Titulo del parrafo"),
-  ng.paragraph("Un parrafo con bla bla bla..."),
-  ng.file("index.html", [
-    '<!doctype html>',
-    '<html lang="en">',
-    '<head>',
-    '  <meta charset="UTF-8">',
-    '  <title>xxxxx</title>',
-    '</head>',
-    '<body>',
-    '',
-    '</body>',
-    '</html>'].join("\n"))
-  ]
-};
-
-*/
+  });

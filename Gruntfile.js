@@ -28,7 +28,10 @@ module.exports = function exports(grunt) {
           var middlewares = [];
           var directory = options.directory || options.base[options.base.length - 1];
           if (!Array.isArray(options.base)) { options.base = [options.base]; }
-          options.base.forEach(function(base) { middlewares.push(connect.static(base)); middlewares.push(connect.static(base+"/assets")); middlewares.push(connect.static(base+"/assets/img")); });
+          options.base.forEach(function(base) {
+            middlewares.push(connect.static(base));
+            middlewares.push(connect.static(base+"/assets"));
+          });
           middlewares.push(function(req,res){
             console.log("Not found "+req.url);
             res.writeHead(302, { 'Location': '/#!' + req.url }); res.end(''); });
@@ -130,17 +133,19 @@ module.exports = function exports(grunt) {
     copy: {
       dist: {
         files: [
-          { expand: true, cwd: './src/', src: ['fonts/*'], dest: './dist/assets'},
-          { expand: true, cwd: './vendor/bootstrap/', src: ['fonts/*'], dest: './dist/assets' },
-          { expand: true, cwd: './src/', src: ['img/*'], dest: './dist/assets' },
+          { expand: true, cwd: './src/', src: ['fonts/**/*'], dest: './dist/assets'},
+          { expand: true, cwd: './vendor/bootstrap/', src: ['fonts/**/*'], dest: './dist/assets' },
+          { expand: true, cwd: './src/', src: ['img/**/*'], dest: './dist/assets' },
+          { expand: true, cwd: './vendor', src: ['ace/**/*'], dest: './dist' },
           //{ expand: true, cwd: './dist', src: ['**/*', '*'], dest: './spotlio-business-phonegap/www' }
         ]
       },
       devel: {
         files: [
-          { expand: true, cwd: './src/', src: ['fonts/*'], dest: './app/assets'},
-          { expand: true, cwd: './vendor/bootstrap/', src: ['fonts/*'], dest: './app/assets' },
-          { expand: true, cwd: './src/', src: ['img/*'], dest: './app/assets' }
+          { expand: true, cwd: './src/', src: ['fonts/**/*'], dest: './app/assets'},
+          { expand: true, cwd: './vendor/bootstrap/', src: ['fonts/**/*'], dest: './app/assets' },
+          { expand: true, cwd: './src/', src: ['img/**/*'], dest: './app/assets' },
+          { expand: true, cwd: './vendor', src: ['ace/**/*'], dest: './app' }
         ]
       }
     }

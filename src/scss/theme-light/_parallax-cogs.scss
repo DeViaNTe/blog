@@ -1,0 +1,109 @@
+
+/* theme: cogs */
+.parallax-cogs {
+  $cog1: 20; // dientes
+  $cog2: 20;
+  $cog3: 30;
+  $cog4: 40;
+  $cog5: 30;
+  $spinOdd: normal;
+  $spinEven: reverse;
+
+  background-image: url("img/wooden-bg.jpg");
+  //background-attachment: fixed;
+  @include box-shadow(inset 0 8px 16px black, inset 0 -8px 16px black);
+
+  .parallax-layer div { width: 400px; height: 400px; }
+
+  $spinTime: 5s;
+  .layer-1 {
+    top: -280px;
+    left: -100px;
+
+    .cog-1 {
+      top: 55px;
+      left: 45px;
+      background-image: url("img/cogs/cog1.png");
+      @include animate(clockwork, $spinTime, 0s, linear, $spinEven, infinite);
+    }
+
+    .cog-2 {
+      top: 224px;
+      left: 205px;
+      background-image: url("img/cogs/cog2.png");
+      @include animate(clockwork, $spinTime * ($cog2 / $cog1), -0.35s, linear, $spinOdd, infinite);
+    }
+
+    .cog-3 {
+      left: 419px;
+      top: 6px;
+      background-image: url("img/cogs/cog3.png");
+      @include animate(clockwork, $spinTime * ($cog2 / $cog1) * ($cog3 / $cog2), -0.35s, linear, $spinEven, infinite);
+    }
+  }
+
+  $spinTime: 20s;
+  .layer-2 {
+    bottom: 280px;
+    left: 200px;
+
+    .cog-1 {
+      top: 55px;
+      right: 45px;
+      background-image: url("img/cogs/cog3.png");
+      @include animate(clockwork, $spinTime, 0s, linear, $spinEven, infinite);
+    }
+
+    .cog-2 {
+      top: 66px;
+      right: -243px;
+      background-image: url("img/cogs/cog1.png");
+      @include animate(clockwork, $spinTime * ($cog1 / $cog3), -0.35s, linear, $spinOdd, infinite);
+    }
+  }
+
+  $spinTime: 25s;
+  .layer-3 {
+    top: 0px;
+    right: 200px;
+
+    .cog-1 {
+      top: -200px;
+      left: -200px;
+      background-image: url("img/cogs/cog2.png");
+      @include animate(clockwork, $spinTime, 0s, linear, $spinEven, infinite);
+    }
+
+    .cog-2 {
+      top: -215px;
+      left: 101px;
+      background-image: url("img/cogs/cog3.png");
+      @include animate(clockwork, $spinTime * ($cog3 / $cog2), 0s, linear, $spinOdd, infinite);
+    }
+    .cog-3 {
+      top: -7px;
+      left: 292px;
+      background-image: url("img/cogs/cog1.png");
+      @include animate(clockwork, $spinTime * ($cog1 / $cog3), -((($spinTime * ($cog1 / $cog3)) / $cog1) * 1.5) , linear, $spinEven, infinite);
+    }
+  }
+
+  $spinTime: 12s;
+  .layer-4 {
+    bottom: 200px;
+    right: 800px;
+
+    .cog-1 {
+      top: 0px;
+      left: 0px;
+      background-image: url("img/cogs/cog4.png");
+      @include animate(clockwork, $spinTime, 0s, linear, $spinEven, infinite);
+    }
+    .cog-2 {
+      top: 0px;
+      left: 361px;
+      background-image: url("img/cogs/cog5.png");
+      @include animate(clockwork, $spinTime * ($cog5 / $cog4), -(($spinTime / $cog3) * 0.5), linear, $spinOdd, infinite);
+    }
+  }
+}

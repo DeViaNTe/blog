@@ -1,18 +1,36 @@
-<div style="padding: 10px;">
-  <div> Tutorial sample: [Animation: {{tutorial._currentStep}} / {{tutorial._steps.length}}] </div>
-  <div>
-    <span ng-show="tutorial._running" class="label label-success">Playing</span>
-    <span ng-show="!(tutorial._running)" class="label label-danger">Stopped</span>
+<div class="parallax-holder parallax-cogs" style="height: 200px">
+  <div class="parallax-layer layer-1">
+    <div class="cog-1"></div>
+    <div class="cog-2"></div>
+    <div class="cog-3"></div>
   </div>
-
-  <div nag-compile="tutorial.view()"></div>
-  <div ng-repeat="step in tutorial._steps[tutorial._currentStep] track by $index">
-    <div ng-include src="'tutorial-element/' + step.props.type + '.html'"></div>
+  <div class="parallax-layer layer-2">
+    <div class="cog-1"></div>
+    <div class="cog-2"></div>
   </div>
+    <div class="parallax-layer layer-3">
+    <div class="cog-1"></div>
+    <div class="cog-2"></div>
+    <div class="cog-3"></div>
+  </div>
+  <div class="parallax-layer layer-4">
+    <div class="cog-1"></div>
+    <div class="cog-2"></div>
+  </div>
+  <div class="parallax-text">
+    Descubriendo el interior
+    <small> reinventando la web </small>
+  </div>
+</div>
+
+<div class="container" style="position: absolute; top: 200px; bottom: 0; left: 0px; right: 0px;">
+
+  <div ng-tutorial style="position: absolute; top: 0; left: 10px; right: 10px; bottom: 60px;"></div>
 
 
-  <div>
-    <button class="btn btn-default pull-left" ng-click="tutorial.prev()">Previous step</button>
-    <button class="btn btn-default pull-right" ng-click="tutorial.next()">Next step</button>
+  <div class="row" style="position: absolute; bottom: 0; height: 60px; left: 20px; right: 20px;">
+    <div class="col-xs-4 text-left"> <button class="btn btn-default" ng-click="tutorial.prev()">Previous step</button> </div>
+    <div class="col-xs-4 text-center"> <button class="btn btn-default" ng-disabled="tutorial.busy" ng-click="tutorial.play()">Play</button> </div>
+    <div class="col-xs-4 text-right"> <button class="btn btn-default" ng-click="tutorial.next()">Next step</button> </div>
   </div>
 </div>

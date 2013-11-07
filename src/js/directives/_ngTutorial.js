@@ -1,6 +1,6 @@
 angular.module('App.Directives')
-  .directive('ngTutorial', ['$timeout', '$sanitize',
-    function($timeout, $sanitize) {
+  .directive('ngTutorial', ['$timeout', '$sanitize', 'engine',
+    function($timeout, $sanitize, engine) {
       return {
         restrict: 'A',
         transclude: false,
@@ -9,122 +9,257 @@ angular.module('App.Directives')
           function($scope, $rootScope, eventmanager, $timeout) {
 
             var done = function() {
-              eventmanager.$emit('tutorialenginecb');
+              eventmanager.$emit(engine.constants.events.ENGINE_COMMAND_DONE);
               if (!($scope.$$phase) && !($rootScope.$$phase)) {
                 $rootScope.$digest();
               }
             };
 
             var lib = {
-              element_create: function(name, content) {
-                var $el = $($sanitize(content));
-                $scope.elements[name] = $el;
-                return done();
-              },
-              element_set_html: function (name, content) {
-                var $el = $scope.elements[name];
-                $el.html($sanitize(content));
-                return done();
-              },
-              element_hide: function (name) {
-                var $el = $scope.elements[name];
-                $el.hide();
-                return done();
-              },
-              element_fadein: function (name, delay) {
-                var $el = $scope.elements[name];
-                $el.fadeIn(delay || 1000, function() { done(); });
-                return null;
-              },
-              element_slidedown: function (name, delay) {
-                var $el = $scope.elements[name];
-                $el.slideDown(delay || 1000, function() { done(); });
-                return null;
-              },
-              element_add_html: function (name, content) {
-                var $el = $scope.elements[name];
-                $el.html($el.html() + content);
-                return done();
-              },
-              element_append: function (from, to) {
-                var $el = $scope.elements[from];
-                var $child = $scope.elements[to];
-                $child.appendTo($el);
-                return done();
-              },
-              element_css: function (name, property, value) {
-                var $el = $scope.elements[name];
-                $el.css(property, value);
-                return done();
-              },
-              element_write: function (name, text, delay, stop) {
-                var $el = $scope.elements[name];
-                var delay = delay || 60;
-                var stop = stop || 1;
-                for (var i=0;i<text.length;i++) {
-                  (function (i) { $timeout(function() { $el.html($el.html() +text[i]); }, i*delay); }(i));
+              manage: {
+                reset: function(stepNumber, options, cmd) {
+                  for (var edit in $scope.$slides[stepNumber].editors) {
+                    $scope.$slides[stepNumber].editors[edit].editor.destroy();
+                    $scope.$slides[stepNumber].editors[edit].element.remove()
+                  }
+                  var stored = { elements: { root: $scope.$element }, editors: {} };
+                  $scope.$slides[stepNumber] = stored;
+                  $($scope.$element[0]).children().remove();
+                  return done();
                 }
-                $timeout(done, (text.length * delay) + stop );
-                return null;
               },
+              editor: {
+                create: function(stepNumber, options, cmd) {
+                  var $el = $('<div>');
+                  if (cmd.data.append) {
+                    // extract position and reference:
+                    var position = "";
+                    var reference = "";
+                    var x = cmd.data.append.split(":");
+                    if (x.length > 1) {
+                      position = x[0];
+                      reference = x[1];
+                    } else {
+                      reference = x[0];
+                      position = "appendTo";
+                    }
 
-              wait: function(delay) {
-                $timeout(done, delay);
-              },
+                    // grab reference
+                    var $reference = $scope.$slides[stepNumber].elements[reference];
+                    if (typeof $reference === "undefined" || $reference === null) {
+                      throw new Error("Element " + reference + " not found.");
+                    }
 
-              editor_attach: function (name) {
-                var $el = $scope.elements[name];
-                var id = $el.attr('id');
-                if (typeof id !== "string") {
-                  id = 'ace_editor_'+name;
-                  $el.attr('id', id);
+                    // apply special css
+                    $el.css(cmd.data.style || {});
+
+                    // append:
+                    $el[position]($reference);
+
+                    // store new element
+                    var editor = ace.edit($el[0]);
+                    editor.setHighlightActiveLine(false);
+                    editor.setReadOnly(true);
+                    editor.setBehavioursEnabled(false);
+                    $scope.$slides[stepNumber].editors[cmd.id] = {
+                      element: $el,
+                      editor: editor
+                    };
+
+                    // set theme
+                    if ($rootScope.theme === "theme-light") {
+                      editor.setTheme('ace/theme/chrome');
+                    }
+                    if ($rootScope.theme === "theme-dark") {
+                      editor.setTheme('ace/theme/monokai');
+                    }
+
+                    // animations?
+                    if (cmd.data.effect && !options.skip) {
+                      switch (cmd.data.effect) {
+                        case "slide":
+                          $el.hide();
+                          $el.slideDown(function() {
+                            editor.resize();
+                            done();
+                          });
+                          return;
+                        case "fade":
+                          $el.hide();
+                          $el.fadeIn(500, function() {
+                            editor.resize();
+                            done();
+                          });
+                          return;
+                      }
+                    }
+                    return done();
+                  }
+                  throw new Error("dead end 03");
+                },
+                mode: function(stepNumber, options, cmd) {
+                  var edit = $scope.$slides[stepNumber].editors[cmd.id];
+                  edit.editor.getSession().setMode('ace/mode/' + cmd.data.lang);
+                  return done();
+                },
+                write: function(stepNumber, options, cmd) {
+                  var edit = $scope.$slides[stepNumber].editors[cmd.id];
+                  var data = cmd.data;
+                  // goto position first:
+                  var pos = data.position;
+                  if (pos && pos.length && pos instanceof Array) {
+                    edit.editor.moveCursorTo(pos[0], pos[1]);
+                  }
+
+                  if (data.effect && !options.skip) {
+                    // insert text
+                    switch (data.effect) {
+                      case "type":
+                        var delay = (data.speed * (1 / options.speedfactor)) || 60;
+                        var stop = (data.wait * (1 / options.speedfactor)) || 1;
+                        var i = 0;
+                        for (i = 0; i < data.text.length; i++) {
+                          (function(i) {
+                            $timeout(function() {
+                              edit.editor.insert(data.text[i]);
+                            }, i * delay);
+                          }(i));
+                        }
+                        $timeout(done, (data.text.length * delay) + stop);
+                        return;
+                    }
+                  }
+                  edit.editor.insert(data.text);
+                  return done();
                 }
-                $scope.editors[name] = ace.edit(id);
-                $scope.editors[name].setReadOnly(true);
-                $scope.editors[name].setBehavioursEnabled(false);
-                $scope.editors[name].setAnimatedScroll(true);
-                $scope.editorMarkers[name] = {};
+              },
+              element: {
+                create: function(stepNumber, options, cmd) {
 
-                window.editor = $scope.editors[name];
+                  var $el = $($sanitize(cmd.data.element));
+                  if (cmd.data.append) {
+                    // extract position and reference:
+                    var position = "";
+                    var reference = "";
+                    var x = cmd.data.append.split(":");
+                    if (x.length > 1) {
+                      position = x[0];
+                      reference = x[1];
+                    } else {
+                      reference = x[0];
+                      position = "appendTo";
+                    }
 
-                if ($rootScope.theme === "theme-light") { $scope.editors[name].setTheme('ace/theme/chrome'); }
-                if ($rootScope.theme === "theme-dark") { $scope.editors[name].setTheme('ace/theme/monokai'); }
+                    // grab reference
+                    var $reference = $scope.$slides[stepNumber].elements[reference];
+                    if (typeof $reference === "undefined" || $reference === null) {
+                      throw new Error("Element " + reference + " not found.");
+                    }
 
+                    // apply special css
+                    $el.css(cmd.data.style || {});
+
+                    // store new element
+                    if (cmd.id) {
+                      $scope.$slides[stepNumber].elements[cmd.id] = $el;
+                    }
+
+                    // append:
+                    $el[position]($reference);
+
+                    // exit;
+                    return done();
+                  }
+                  throw new Error("dead end 01;");
+                },
+                write: function(stepNumber, options, cmd) {
+                  var $element = $scope.$slides[stepNumber].elements[cmd.id];
+                  if ($element) {
+                    if (cmd.data.effect && !options.skip) {
+                      switch (cmd.data.effect) {
+                        case "type":
+                          var delay = (cmd.data.speed * (1 / options.speedfactor)) || 60;
+                          var stop = (cmd.data.wait * (1 / options.speedfactor)) || 1;
+                          var i = 0;
+                          for (i = 0; i < cmd.data.text.length; i++) {
+                            (function(i) {
+                              $timeout(function() {
+                                $element.html($element.html() + cmd.data.text[i]);
+                              }, i * delay);
+                            }(i));
+                          }
+                          $timeout(done, (cmd.data.text.length * delay) + stop);
+                          return null;
+                          break;
+                        case "fade":
+                          var delay = null || 60;
+                          var stop = null || 1;
+                          $element.html($element.html() + cmd.data.text);
+                          return done();
+                          break;
+                      }
+                    }
+                    $element.html($element.html() + cmd.data.text);
+                    return done();
+                  }
+                  throw new Error("dead end 02;");
+                }
+
+              }
+            };
+
+
+            var libb = {
+              editor_attach: function() {
                 var $cover = $('<div>');
-                $cover.css({position:'absolute', top: 0, left: 0, right: 0, bottom: 0, 'z-index': 200});
-                $cover.on('click, mousedown, touchstart', function(event) { event.preventDefault(); return false; });
+                $cover.css({
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  'z-index': 200
+                });
+                $cover.on('click, mousedown, touchstart', function(event) {
+                  event.preventDefault();
+                  return false;
+                });
                 $el.append($cover);
                 return done();
               },
-              editor_session: function (editorName, command) {
+              editor_session: function(editorName, command) {
                 var editor = $scope.editors[editorName];
                 var session = editor.getSession();
                 var args = Array.prototype.slice.call(arguments);
-                args.splice(0,2);
+                args.splice(0, 2);
                 session[command].apply(session, args);
                 return done();
               },
-              editor_command: function (editorName, command) {
+              editor_command: function(editorName, command) {
                 var editor = $scope.editors[editorName];
                 var args = Array.prototype.slice.call(arguments);
-                args.splice(0,2);
+                args.splice(0, 2);
                 editor[command].apply(editor, args);
                 return done();
               },
-              editor_write: function (editorName, text, delay, stop) {
+              editor_write: function(editorName, text, delay, stop) {
                 var editor = $scope.editors[editorName];
                 var delay = delay || 100;
                 var stop = stop || 1;
-                for (var i=0;i<text.length;i++) {
-                  (function (i) { $timeout(function() { editor.insert(text[i]); }, i*delay); }(i));
+                for (var i = 0; i < text.length; i++) {
+                  (function(i) {
+                    $timeout(function() {
+                      editor.insert(text[i]);
+                    }, i * delay);
+                  }(i));
                 }
                 $timeout(done, (text.length * delay) + stop);
                 return null;
               },
-              editor_select: function (editorName, col, row, toCol, toRow) {
+              editor_select: function(editorName, col, row, toCol, toRow) {
                 var editor = $scope.editors[editorName];
                 editor.moveCursorTo(col, row);
-                editor.selection.selectTo(toCol,toRow);
+                editor.selection.selectTo(toCol, toRow);
                 return done();
               },
               editor_find: function(editorName, text) {
@@ -146,26 +281,49 @@ angular.module('App.Directives')
               }
             };
 
-            var $clear = eventmanager.$on('tutorialengine', function (command) {
-              if (lib[command]) {
-                var args = Array.prototype.slice.call(arguments);
-                args.splice(0,1);
-                lib[command].apply(this, args);
-                return;
+            var $clearHandler = eventmanager.$on(engine.constants.events.ENGINE_PROCESS_CMD, function(stepNumber, options, command) {
+              $scope.options = options;
+              $scope.step = stepNumber;
+
+              // prepare context
+              var stored = $scope.$slides[stepNumber] || {
+                elements: {
+                  root: $scope.$element
+                },
+                editors: {}
+              };
+
+              $scope.$slides[stepNumber] = stored;
+
+              // exists function ?
+              var fn = lib[command.space];
+              if (fn === null || typeof fn === "undefined") {
+                throw new Error("Command namespace not found: " + command.space);
               }
-              alert('command unknown! ' + command);
+              fn = fn[command.command];
+              if (fn === null || typeof fn === "undefined") {
+                throw new Error("Function " + command.command + " not found in " + command.space + " namespace.");
+              }
+
+              // exec command!
+              try {
+                return fn(stepNumber, options, command);
+              } catch (err) {
+                throw new Error(err);
+              }
             });
 
-            $scope.$on('$destroy', function() { $clear(); });
+            $scope.$on('$destroy', function() {
+              $clearHandler();
+              $clearFirst();
+            });
           }
         ],
         compile: function(tElement, tAttrs, transclude) {
           return {
             pre: function preLink(scope, $element, $attributes, controller) {
               scope.$element = $element;
-              scope.elements = { tutorial: $element };
-              scope.editors = {};
-              scope.editorMarkers = {};
+              scope.$slides = {};
             }
           };
         }

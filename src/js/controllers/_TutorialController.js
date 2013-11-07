@@ -8,57 +8,40 @@ angular.module('App.Controllers')
         "steps": [
         {
           actions: [
-            // create title wrapper:
-            ['element_create',    'titlewrapper', '<div class="page-header"></div>'],
-            ['element_append',    'tutorial', 'titlewrapper'],
-            // create title
-            ['element_create',    'maintitle', '<h2 />'],
-            ['element_append',    'titlewrapper', 'maintitle'],
-            // write title
-            ['element_write',     'maintitle', 'Directivas en angular', 120],
+            { space: 'element', command: 'create', id: 'title-wrapper', data: { append: 'root', element: '<div class="page-header"></div>' } },
+            { space: 'element', command: 'create', id: 'title', data: { append: 'title-wrapper', element: '<h1></h1>' } },
+            { space: 'element', command: 'write',  id: 'title', data: { text: 'Directivas en angular', effect: 'type', speed: 120 } },
 
-            // create ace editor
-            ['element_create',    'editor1', '<div />'],
-            ['element_css',       'editor1', 'height', '200px'],
-            ['element_append',    'tutorial', 'editor1'],
-            ['editor_attach',     'editor1'],
-            ['element_hide',      'editor1'],
-            ['wait', 1000],
-            ['element_slidedown', 'editor1', 1500],
+            { space: 'element', command: 'create', id: 'explanation', data: { append:'insertAfter:title-wrapper', element: '<p></p>', effect: 'slide' } },
+            { space: 'element', command: 'write',  id: 'explanation', data: { text: 'aaa', effect: 'fade', speed: 120  } },
 
-            ['editor_session',    'editor1', 'setMode', 'ace/mode/javascript'],
-            ['wait', 500],
+            { space: 'editor', command: 'create',  id: 'directive01', data: { append: 'root', effect: 'slide', style: { height: "200px" } } },
+            { space: 'editor', command: 'mode',    id: 'directive01', data: { lang: 'javascript' } },
+            { space: 'editor', command: 'write',   id: 'directive01', data: { position: [1,0], text: '// nuestras directivas deberán pertenecer a un módulo para \n', effect: 'type', speed: 60, wait: 120 } },
+            { space: 'editor', command: 'write',   id: 'directive01', data: { text: '// que la aplicación pueda requerirlas posteriormente, con \n', effect: 'type', speed: 50, wait: 120 } },
+            { space: 'editor', command: 'write',   id: 'directive01', data: { text: '// lo que podemos comenzar con el encapsulado modular: ', effect: 'type', speed: 50, wait: 120 } },
+            { space: 'editor', command: 'write',   id: 'directive01', data: { text: '\n\n', effect: 'type', speed: 100, wait: 600 } },
 
-            ['editor_command',    'editor1', 'gotoLine', 1],
-            ['editor_write',      'editor1', "// nuestras directivas deberán pertenecer a un módulo para \n", 60, 120],
-            ['editor_write',      'editor1', "// que la aplicación pueda requerirlas posteriormente, con \n", 50, 120],
-            ['editor_write',      'editor1', "// lo que podemos comenzar con el encapsulado modular: ", 50, 1500],
-            ['editor_write',      'editor1', "\n\n", 100, 600],
-
-            ['editor_write',      'editor1', "angular.module(", 100, 800],
-            ['editor_write',      'editor1', "'miAplicacion.directivas'", 120, 300],
-            ['editor_write',      'editor1', ", [])\n", 100, 800],
-            ['editor_write',      'editor1', ".directive(", 100, 800],
-            ['editor_write',      'editor1', "'miPrimeraDirectiva'", 120, 800],
-            ['editor_write',      'editor1', ", [function (){ }]);\n", 100, 1500],
-            ['editor_command',    'editor1', 'setHighlightActiveLine', false],
-
-            // create explanation
-            ['element_create',    'explanation', '<p class="lead"></p>'],
-            ['element_append',    'tutorial', 'explanation'],
-            ['element_write',     'explanation', 'Primero podemos observar dos puntos clave, el primero, tras la declaración del módulo, dónde pasamos como segundo argumento una lista vacía.', 60],
-            ['wait', 500],
-            ['editor_select',     'editor1', 4,42, 4,44],
-            ['editor_addmarker',  'editor1', 'module-dependencies', 'ace_marker-flashing-gold'],
-            ['wait', 1500],
-            ['element_add_html',  'explanation', '<br>'],
-            ['element_write',     'explanation', 'En esta primera lista deberíamos introducir los módulos de los que depende nuestro nuevo módulo. En este caso no utilitzaremos ningún módulo pero en posteriores ejemplos veremos su utilidad.', 60, 1500],
-            ['editor_removemarker', 'editor1', 'module-dependencies'],
-
-            ['element_add_html',  'explanation', '<br>'],
-            ['element_write',     'explanation', 'El segundo punto clave es la declaración de la directiva, dónde no pasamos directamente una función, sino una lista con un elemento del tipo función.', 60, 500],
-            ['editor_find',       'editor1', '[function (){ }]'],
-            ['editor_addmarker',  'editor1', 'directive-dependencies', 'ace_marker-flashing-gold'],
+            { space: 'editor', command: 'write',   id: 'directive01', data: { text: 'angular.module(', effect: 'type', speed: 100, wait: 800 } },
+            { space: 'editor', command: 'write',   id: 'directive01', data: { text: "'miAplicacion.directivas'", effect: 'type', speed: 120, wait: 300 } },
+            { space: 'editor', command: 'write',   id: 'directive01', data: { text: ", [])\n", effect: 'type', speed: 100, wait: 800 } },
+            { space: 'editor', command: 'write',   id: 'directive01', data: { text: ".directive(", effect: 'type', speed: 100, wait: 800 } },
+            { space: 'editor', command: 'write',   id: 'directive01', data: { text: "'miPrimeraDirectiva'", effect: 'type', speed: 120, wait: 800 } },
+            { space: 'editor', command: 'write',   id: 'directive01', data: { text: ", [function (){ }]);\n", effect: 'type', speed: 100, wait: 1500 } },
+          ]
+        },
+        {
+          actions: [
+            { space: 'editor', command: 'write',   id: 'directive01', data: { text: 'angular.module(', effect: 'type', speed: 100, wait: 800 } },
+            { space: 'editor', command: 'write',   id: 'directive01', data: { text: "'miAplicacion.directivas'", effect: 'type', speed: 120, wait: 300 } },
+            { space: 'editor', command: 'write',   id: 'directive01', data: { text: ", [])\n", effect: 'type', speed: 100, wait: 800 } },
+          ]
+        },
+        {
+          actions: [
+            { space: 'editor', command: 'write',   id: 'directive01', data: { text: ".directive(", effect: 'type', speed: 100, wait: 800 } },
+            { space: 'editor', command: 'write',   id: 'directive01', data: { text: "'miPrimeraDirectiva'", effect: 'type', speed: 120, wait: 800 } },
+            { space: 'editor', command: 'write',   id: 'directive01', data: { text: ", [function (){ }]);\n", effect: 'type', speed: 100, wait: 1500 } },
           ]
         }]
       });
